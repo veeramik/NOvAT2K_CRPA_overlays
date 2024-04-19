@@ -203,10 +203,10 @@ TString SKSampleNames[] = {
   TPad* pad1;
   TPad* pad2;
 
-//pad1 = new TPad("pad1", "pad1", 0, 0.35, 1.0, 1.0);
-  pad1 = new TPad("pad1", "pad1", 0, 0.1, 1.0, 1.0);
+   pad1 = new TPad("pad1", "pad1", 0, 0.17, 1.0, 1.0);
+  // pad1 = new TPad("pad1", "pad1", 0, 0.1, 1.0, 1.0);
   //pad1->SetBottomMargin(0.035);;
-  pad1->SetBottomMargin(0.1);;
+  pad1->SetBottomMargin(0.2);
 
   pad1->SetGridx(0);
   pad1->SetGridy(0);
@@ -217,14 +217,14 @@ TString SKSampleNames[] = {
   pad1->Draw();
   c1->cd();
 
-  pad2 = new TPad("pad2", "pad2", 0, 0, 0, 0);
-  //pad2 = new TPad("pad2", "pad2", 0, 0.1, 1.0, 1.0);
+  //pad2 = new TPad("pad2", "pad2", 0, 0, 0, 0);
+  pad2 = new TPad("pad2", "pad2", 0, 0.1, 1.0, 0.3);
   pad2->SetGridx(1);
   pad2->SetGridy(1);
   pad2->SetTopMargin(0);
   pad2->SetBottomMargin(0.15);
-  pad2->SetTopMargin(0.03);
-  //pad2->Draw();
+  //pad2->SetTopMargin(0.03);
+  pad2->Draw();
   c1->cd();
   
   //xc1->Print(outname+".pdf[");
@@ -232,14 +232,14 @@ TString SKSampleNames[] = {
   //for(int sample_i = 0 ; sample_i < FDS_hists.size(); sample_i++){
  for(int sample_i = 0 ; sample_i < 1; sample_i++){
   
-   std::cout << "I got here to sample " <<  sample_i <<  std::endl;
+   //std::cout << "I got here to sample " <<  sample_i <<  std::endl;
 
-   std::cout << "sk_"+sample[sample_i]+sample_i << std::endl;
+   //std::cout << "sk_"+sample[sample_i]+sample_i << std::endl;
 
         TH1* hist = 0;
         //TGraphErrors* hist = 0;
-	//fPosPred->GetObject("sk_"+sample[sample_i]+sample_i, hist);
-	fPosPred->GetObject("sk_"+sample[sample_i], hist);
+	fPosPred->GetObject("sk_"+sample[sample_i]+sample_i, hist);
+	//fPosPred->GetObject("sk_"+sample[sample_i], hist);
 	
 	if(hist){
 	  std::cout << "Successfully found pos pred sk_"+sample[sample_i] << std::endl;
@@ -275,13 +275,12 @@ TString SKSampleNames[] = {
 	//if(do_ratio_to_nom){
 	//nom_hists[sample_i]->Draw("HIST SAMES");
 	//}
-	 hist->Draw("E2 SAMES");
+	hist->Draw("E2 SAMES");
 	 
 	if(sample_i==0){
 	  leg->AddEntry(hist, pos_pred_title, "f");
 	}
 	leg->Draw();
-
 
 
 	if(do_ratio_to_nom){
@@ -296,11 +295,12 @@ TString SKSampleNames[] = {
 
 	}
 
+	c1->Update();
 	//Make ratios
 	//TGraphErrors *ratio_graph = (TGraphErrors*)hist->Clone();
 	TH1D* ratio_graph = (TH1D*)hist->Clone();
 	TH1D* ratio = (TH1D*)FDS_hists[sample_i]->Clone();
-	ratio->Reset("ICES");
+	//ratio->Reset("ICES");
 	//ratio_graph->Reset("ICES");
 
 	// max value to use to set y-axis range later
@@ -330,39 +330,42 @@ TString SKSampleNames[] = {
 	  double  pos_pred_val = hist->GetBinContent(hist_bin);
 
 	  
-	  std::cout << "~~~~~~~" << std::endl;
-	  std::cout << "BIN center for histogram is " << bin_centre << std::endl;
-	  std::cout << "POINT x-val for graph is " << hist->GetBinContent(hist_bin) << std::endl;
-	  std::cout << "FDS_val = " << FDS_val << std::endl;
-	  std::cout << "pos_pred_val = " << pos_pred_val << std::endl;
-	  std::cout << "nom = " << nom << std::endl;
+	  //std::cout << "~~~~~~~" << std::endl;
+	  //std::cout << "BIN center for histogram is " << bin_centre << std::endl;
+	  //std::cout << "POINT x-val for graph is " << hist->GetBinContent(hist_bin) << std::endl;
+	  //std::cout << "FDS_val = " << FDS_val << std::endl;
+	  //std::cout << "pos_pred_val = " << pos_pred_val << std::endl;
+	  //std::cout << "nom = " << nom << std::endl;
 	  
 
 	  double ratio_to_nom = 1.;
 	  double ratio_val = 1.;
 	  double error = 0;
 
-	  //  if(nom > 0.01 && FDS_hists[sample_i]->GetBinContent(hist_bin) > 0.01){
-	  //	ratio_to_nom = FDS_hists[sample_i]->GetBinContent(hist_bin) / nom; 
-		//double error = (nom/pos_pred_val)*sqrt(pow(sqrt(nom)/nom,2) + pow(hist->GetErrorY(bin_i)/pos_pred_val,2));
-	  //	error = (nom/pos_pred_val)*sqrt(pow(hist->GetErrorY(bin_i)/pos_pred_val,2));
+	    if(nom > 0.01 && FDS_hists[sample_i]->GetBinContent(hist_bin) > 0.01){
+	  	ratio_to_nom = FDS_hists[sample_i]->GetBinContent(hist_bin) / nom; 
+		double error = (nom/pos_pred_val)*sqrt(pow(sqrt(nom)/nom,2) + pow(hist->GetBinError(bin_i)/pos_pred_val,2));
+	  	error = (nom/pos_pred_val)*sqrt(pow(hist->GetBinError(bin_i)/pos_pred_val,2));
 
 
-	  //	ratio_val = hist->GetPointY(bin_i) / nom;
-	  //	ratio->SetBinContent(hist_bin, ratio_to_nom);
-	  //	std::cout << "Histogram has value " << ratio_to_nom << std::endl;  
-	  //	std::cout << "Graph has value " << ratio_val << std::endl;
-	  //	ratio_graph->SetPoint(bin_i, bin_centre, ratio_val);
-	  //	ratio_graph->SetPointError(bin_i, bin_width/2, error);
-	  //	std::cout << "Error is " << error << std::endl; 
-	  // }
-	  // else{
+	  	//ratio_val = hist->GetPointY(bin_i) / nom;
+		ratio_val = hist->GetBinContent(bin_i) / nom;
+	  	ratio->SetBinContent(hist_bin, ratio_to_nom);
+	  	//std::cout << "Histogram has value " << ratio_to_nom << std::endl;  
+	  	//std::cout << "Graph has value " << ratio_val << std::endl;
+	  	//ratio_graph->SetPoint(bin_i, bin_centre, ratio_val);
+		ratio_graph->SetBinContent(bin_i, bin_centre, ratio_val);
+	  	//ratio_graph->SetPointError(bin_i, bin_width/2, error);
+		ratio_graph->SetBinError(bin_i, bin_width/2, error);
+	  	//std::cout << "Error is " << error << std::endl; 
+	   }
+	   else{
 		ratio->SetBinContent(hist_bin, 1.0);
 		//ratio_graph->SetPoint(bin_i, bin_centre, 1.);
 		ratio_graph->SetBinContent(bin_i, bin_centre, 1.);
 		//ratio_graph->SetPointError(bin_i, bin_width/2, 0);
 		ratio_graph->SetBinError(bin_i, bin_width/2);
-		//  }
+	        }
 
 	//Update the maximum value
 	  if(bin_centre < SKXaxisRange[sample_i]){
@@ -382,6 +385,8 @@ TString SKSampleNames[] = {
 	double range_to_use;
 	if(ratio_max - 1 > abs(1 - ratio_min)){range_to_use = ratio_max - 1;}
 	else{range_to_use = abs(1 - ratio_min);}
+
+	std::cout << range_to_use << " " << ratio_min << std::endl;
 	
 	std::cout << "Setting range to " << 1 - range_to_use*1.1 << " to " << 1 + range_to_use*1.1 << std::endl;
 	ratio->GetYaxis()->SetRangeUser(1 - range_to_use*1.1, 1 + range_to_use*1.1);
@@ -395,12 +400,14 @@ TString SKSampleNames[] = {
 	}
 
 	ratio->GetXaxis()->SetTitle("Reconstructed Neutrino energy [GeV]");
-	ratio->Draw("HIST");
+	ratio->GetXaxis()->SetTitleOffset(0.9);
+	ratio->Draw("HIST SAME");
 	ratio_graph->SetTitle("");
 	ratio_graph->SetLineColor(kBlue+1);
 	ratio_graph->SetMarkerColor(kBlue+1);
 	ratio_graph->Draw("E SAMES");
-
+	
+	c1->Update();
 	c1->Print(outname+".pdf");
 
   }

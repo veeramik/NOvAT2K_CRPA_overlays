@@ -15,14 +15,14 @@ FDS_DIR="/Users/vmikola/Downloads"
 #FHC_FDS_NAME="${FDS_DIR}/SK_plots_T2K_NOvA_CRPA_Asimov4_FHC.root"
 #RHC_FDS_NAME="${FDS_DIR}/SK_plots_T2K_NOvA_CRPA_Asimov4_RHC.root"
 
-#FHC_FDS_NAME="${FDS_DIR}/SK_plots_T2K_NOvA_FDS_CRPA_Asimov4_Q2_pars_at_one_combined.root"
-FHC_FDS_NAME="${FDS_DIR}/SK_plots_T2K_NOvA_FDS_CRPA_Asimov1_Q2_pars_at_one_combined.root"
+FHC_FDS_NAME="${FDS_DIR}/SK_plots_T2K_NOvA_FDS_CRPA_Asimov4_Q2_pars_at_one_combined.root"
+#FHC_FDS_NAME="${FDS_DIR}/SK_plots_T2K_NOvA_FDS_CRPA_Asimov1_Q2_pars_at_one_combined.root"
 FDS_LABEL="CRPA FDS"
 
-POS_PRED_FILE="/Users/vmikola/Downloads/CRPA-Asimov1-T2K-PostPred_noSK_fixed.root"
-#POS_PRED_FILE="../SK_posPred/CRPA-Asimov4-T2K-PostPred_SKspectra.root"
+#POS_PRED_FILE="/Users/vmikola/Downloads/CRPA-Asimov1-T2K-PostPred_noSK_fixed.root"
+POS_PRED_FILE="/Users/vmikola/Downloads/CRPA-Asimov4-T2K-PostPred_noSK.root"
 POSPRED_LABEL="Fit to FDS"
-OUTNAME="CRPA_comp_Asimov1_SK_T2KNOvA_posPred_FDS_fit_withratio"
+OUTNAME="CRPA_comp_Asimov4_T2KNOvA_posPred_FDS_fit_withratio"
 
 #eval "root -l -b -q 'SK_FDS_comp_pos_pred_overlay.C(\"${FHC_FDS_NAME}\", \"${RHC_FDS_NAME}\", \"${FDS_LABEL}\", \"${FHC_NOM_NAME}\", \"${RHC_NOM_NAME}\", \"${POS_PRED_FILE}\", \"${COMP_LABEL}\", \"${OUTNAME}\", \"${POSPRED_LABEL}\", false)'"
 
