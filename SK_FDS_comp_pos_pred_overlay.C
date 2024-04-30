@@ -58,6 +58,54 @@ void getSampleHists(TFile *fFHC, std::vector<TH1D*> &hist_vec){
   return;
 }
 
+void getSampleHists2(TFile *fFHC, std::vector<TH1D*> &hist_vec){
+  
+  TH1D* numu = new TH1D();
+  TH1D* numub = new TH1D();
+  //TH1D* nue = new TH1D();
+  //TH1D* nueb = new TH1D();
+  //TH1D* nue1pi = new TH1D();
+  
+  numu = (TH1D*)fFHC->Get("hnumu")->Clone();
+  //nue = (TH1D*)fFHC->Get("nue_nominal_hist")->Clone();
+  //numub = (TH1D*)fRHC->Get("numu_nominal_hist")->Clone("numub");
+  numub = (TH1D*)fFHC->Get("hnumub")->Clone();
+  //nueb = (TH1D*)fRHC->Get("nue_nominal_hist")->Clone("nueb");
+  //nueb = (TH1D*)fFHC->Get("nue_nominal_hist")->Clone("nueb");
+  //nue1pi = (TH1D*)fFHC->Get("nue1pi_nominal_hist")->Clone();
+
+  numu->SetDirectory(0);
+  numub->SetDirectory(0);
+  //nue->SetDirectory(0);
+  //nueb->SetDirectory(0);
+  //nue1pi->SetDirectory(0);
+
+  //Now pushing back vector
+  std::cout << "Now pushing back vector with histos" << std::endl;
+  hist_vec.push_back(numu);
+  hist_vec.push_back(numub);
+  //hist_vec.push_back(nue);
+  //hist_vec.push_back(nueb);
+  //hist_vec.push_back(nue1pi); 
+  
+   bool found_all = true;
+  //Now a quick check to make sure we've got all the FDS histograms
+  for(int sample_i = 0 ; sample_i < 2 ; sample_i++){
+    std::cout << sample_i << std::endl;
+    if(!hist_vec[sample_i]){
+  	  std::cout << "Couldn't find sample " << sample_i << std::endl;
+  	  found_all = false;
+  	}
+  	else{std::cout << "Successfully found sample " << sample_i << std::endl;}
+   }
+  
+
+   if(!found_all){std::cout << "Didn't find all the SK FDS sample histograms so I'm out of here!" << std::endl; exit(1);}
+   
+  return;
+}
+
+
 //void getSampleStacks(TFile *fFHC, TFile *fRHC, std::vector<THStack*> &hist_vec){
 
 // THStack* numu = new THStack();
@@ -105,7 +153,8 @@ void getSampleHists(TFile *fFHC, std::vector<TH1D*> &hist_vec){
 
 
 //void SK_FDS_comp_pos_pred_overlay(TString SK_FDS_FHC_name, TString SK_FDS_RHC_name, TString FDS_label, TString SK_nom_FHC_name,  TString SK_nom_RHC_name, TString posPredFile_name, TString comp_label, TString outname, TString pos_pred_title, bool do_ratio_to_nom=false){
-void SK_FDS_comp_pos_pred_overlay(TString SK_FDS_FHC_name, TString FDS_label, TString posPredFile_name, TString comp_label, TString outname, TString pos_pred_title, bool do_ratio_to_nom=false){
+void SK_FDS_comp_pos_pred_overlay(TString SK_FDS_FHC_name, TString FDS_label, TString SK_nom_FHC_name, TString posPredFile_name, TString comp_label, TString outname, TString pos_pred_title, bool do_ratio_to_nom=false){
+//void SK_FDS_comp_pos_pred_overlay(TString SK_FDS_FHC_name, TString FDS_label, TString posPredFile_name, TString comp_label, TString outname, TString pos_pred_title, bool do_ratio_to_nom=false){
 
   std::cout << "OUTNAME IS " << outname << std::endl;
 
@@ -124,7 +173,7 @@ void SK_FDS_comp_pos_pred_overlay(TString SK_FDS_FHC_name, TString FDS_label, TS
   //TFile *fSK_FDS_RHC = new TFile(SK_FDS_RHC_name, "READ");
   
   //nominal files
-  //TFile *fSK_nom_FHC = new TFile(SK_nom_FHC_name, "READ");
+  TFile *fSK_nom_FHC = new TFile(SK_nom_FHC_name, "READ");
   //TFile *fSK_nom_RHC = new TFile(SK_nom_RHC_name, "READ");
 
   //Pos Pred file
@@ -179,8 +228,8 @@ TString SKSampleNames[] = {
   std::vector<TH1D*> FDS_hists;
   getSampleHists(fSK_FDS_FHC, FDS_hists);
 
-  //std::vector<TH1D*> nom_hists;
-  //getSampleHists(fSK_nom_FHC, nom_hists);
+  std::vector<TH1D*> nom_hists;
+  getSampleHists2(fSK_nom_FHC, nom_hists);
 
   //Get the posterior predictive spectra from file
 
@@ -190,10 +239,11 @@ TString SKSampleNames[] = {
 
   //Make a nice TLegend for the plots
   FDS_hists[0]->SetLineColor(kRed);
-  //nom_hists[0]->SetLineColor(kBlack);
+  nom_hists[0]->SetLineColor(kBlack);
+
   TLegend* leg = new TLegend(0.63, 0.60, 0.78, 0.88);
   leg->AddEntry(FDS_hists[0], FDS_label, "l");
-  //leg->AddEntry(nom_hists[0], comp_label, "l");
+  leg->AddEntry(nom_hists[0], comp_label, "l");
   leg->SetTextSize(0.035);
   leg->SetBorderSize(0);
   
@@ -253,7 +303,10 @@ TString SKSampleNames[] = {
 	FDS_hists[sample_i]->SetLineColor(kRed);
         FDS_hists[sample_i]->SetMarkerStyle(20);
         FDS_hists[sample_i]->SetMarkerColor(kRed+2);
-	//nom_hists[sample_i]->SetLineColor(kBlack);
+
+	nom_hists[sample_i]->SetLineColor(kBlack);
+	nom_hists[sample_i]->SetMarkerStyle(20);
+
 
 	//	double y_max = 0;
 	//if(FDS_hists[sample_i]->GetMaximum() > nom_hists[sample_i]->GetMaximum()){y_max = FDS_hists[sample_i]->GetMaximum()*1.1;}
@@ -270,6 +323,8 @@ TString SKSampleNames[] = {
 	FDS_hists[sample_i]->GetYaxis()->SetTitle("Events");
 	//FDS_hists[sample_i]->Draw("P");
 	FDS_hists[sample_i]->Draw();
+	
+	nom_hists[sample_i]->Draw("same");
 	
 	//If you aren't doing the ratio then don't bother drawing the nominal which you'd be taking the ratio relative to
 	//if(do_ratio_to_nom){
